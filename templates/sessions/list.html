@@ -1,0 +1,44 @@
+{% extends "../base.html" %}
+
+{% block title %}Sessions - Gym Tracker{% endblock %}
+
+{% block nav %}{% include "nav.html" %}{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <h1>Workout Sessions</h1>
+    <a href="/sessions/new" class="btn btn-primary">Plan Session</a>
+</div>
+
+{% if let Some(msg) = message %}
+<div class="alert alert-success">{{ msg }}</div>
+{% endif %}
+
+{% if sessions.is_empty() %}
+<p class="empty-state">No sessions yet. Plan your first workout session!</p>
+{% else %}
+<div class="card-list">
+    {% for s in sessions %}
+    <div class="card-item">
+        <div class="card-item-header">
+            <a href="/sessions/{{ s.session.id }}" class="card-item-title">{{ s.session.name }}</a>
+            <span class="badge badge-{{ s.session.status }}">{{ s.session.status }}</span>
+        </div>
+        <div class="card-item-meta">{{ s.session.scheduled_at }}</div>
+        {% if !s.exercise_preview.is_empty() %}
+        <div class="card-item-meta">{{ s.exercise_preview }}</div>
+        {% endif %}
+        <div class="card-item-actions">
+            {% if s.session.status == "planned" %}
+            <a href="/sessions/{{ s.session.id }}/workout" class="btn btn-sm btn-primary">Start</a>
+            {% endif %}
+            <a href="/sessions/{{ s.session.id }}/edit" class="btn btn-sm">Edit</a>
+            <form method="post" action="/sessions/{{ s.session.id }}" class="inline" onsubmit="return confirmDelete('session')">
+                <button type="submit" class="btn btn-sm btn-danger">Delete</button>
+            </form>
+        </div>
+    </div>
+    {% endfor %}
+</div>
+{% endif %}
+{% endblock %}

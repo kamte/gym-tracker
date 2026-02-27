@@ -1,0 +1,126 @@
+{% extends "../base.html" %}
+
+{% block title %}Workout: {{ session.name }} - Gym Tracker{% endblock %}
+
+{% block content %}
+<div class="workout-header">
+    <div>
+        <h1>{{ session.name }}</h1>
+        {% if let Some(started) = session.started_at %}
+        <div class="workout-elapsed" id="elapsed-timer" data-started-at="{{ started }}">
+            <span class="elapsed-icon">&#x23F1;</span>
+            <span id="elapsed-time">00:00</span>
+        </div>
+        {% endif %}
+    </div>
+    <form method="post" action="/sessions/{{ session.id }}/complete" class="inline">
+        <button type="submit" class="btn btn-outline btn-sm">Finish Workout</button>
+    </form>
+</div>
+
+{% if let Some(pr) = pr_type %}
+<div class="pr-banner" id="pr-banner">
+    &#x1F3C6; New Personal Record! ({{ pr }})
+</div>
+{% endif %}
+
+{% for ex in exercises %}
+<div class="workout-exercise-card">
+    <div class="workout-exercise-header">
+        <h2>{{ ex.exercise_name }}</h2>
+        <span class="badge">{{ ex.muscle_group }}</span>
+    </div>
+    <div class="workout-exercise-target">
+        Target: {{ ex.planned_sets }} sets x {{ ex.planned_reps }} reps{% if ex.planned_weight_kg > 0.0 %} @ {{ ex.planned_weight_kg }}kg{% endif %}
+    </div>
+
+    {% for set in ex.completed_sets %}
+    <div class="workout-set completed">
+        <span>&#x2713; Set {{ set.set_number }}: {{ set.weight_kg }}kg x {{ set.reps_completed }} reps</span>
+        {% if set.set_type != "working" %}
+        <span class="badge badge-set-{{ set.set_type }}">{{ set.set_type }}</span>
+        {% endif %}
+    </div>
+    {% endfor %}
+
+    {% if (ex.completed_sets.len() as i64) < ex.planned_sets %}
+    <form method="post" action="/sessions/{{ session.id }}/workout/log" class="workout-log-form">
+        <input type="hidden" name="exercise_id" value="{{ ex.exercise_id }}">
+        <input type="hidden" name="set_number" value="{{ ex.completed_sets.len() as i64 + 1 }}">
+        <div class="set-type-pills">
+            <label class="set-type-pill">
+                <input type="radio" name="set_type" value="warmup" class="sr-only">
+                <span class="pill">Warm-up</span>
+            </label>
+            <label class="set-type-pill">
+                <input type="radio" name="set_type" value="working" checked class="sr-only">
+                <span class="pill active">Working</span>
+            </label>
+            <label class="set-type-pill">
+                <input type="radio" name="set_type" value="drop" class="sr-only">
+                <span class="pill">Drop</span>
+            </label>
+            <label class="set-type-pill">
+                <input type="radio" name="set_type" value="failure" class="sr-only">
+                <span class="pill">Failure</span>
+            </label>
+        </div>
+        <div class="workout-set-inputs">
+            <div class="form-group">
+                <label>Weight (kg)</label>
+                <input type="number" name="weight_kg" step="0.5" min="0" value="{{ ex.suggested_weight }}" class="workout-input">
+            </div>
+            <div class="form-group">
+                <label>Reps</label>
+                <input type="number" name="reps_completed" min="0" value="{{ ex.planned_reps }}" class="workout-input">
+            </div>
+            <div class="form-group">
+                <label>Rest</label>
+                <select name="rest" class="workout-input rest-select">
+                    <option value="60">60s</option>
+                    <option value="90" selected>90s</option>
+                    <option value="120">120s</option>
+                    <option value="180">180s</option>
+                </select>
+            </div>
+            <button type="submit" class="btn btn-primary">Log Set</button>
+        </div>
+    </form>
+    {% else %}
+    <div class="workout-set-complete">All sets complete &#x2713;</div>
+    {% endif %}
+</div>
+{% endfor %}
+
+<form method="post" action="/sessions/{{ session.id }}/complete">
+    <button type="submit" class="btn btn-primary btn-block">Finish Workout</button>
+</form>
+
+<!-- Rest Timer Bar -->
+<div id="rest-timer-bar" class="rest-timer-bar hidden">
+    <div class="rest-timer-content">
+        <div class="rest-timer-display">
+            <span class="rest-timer-label">Rest</span>
+            <span class="rest-timer-time" id="rest-timer-time">0:00</span>
+        </div>
+        <div class="rest-timer-controls">
+            <button class="btn btn-sm" onclick="restTimer.adjust(-15)">-15s</button>
+            <button class="btn btn-sm" onclick="restTimer.toggle()" id="rest-timer-toggle">Pause</button>
+            <button class="btn btn-sm" onclick="restTimer.adjust(15)">+15s</button>
+            <button class="btn btn-sm btn-outline" onclick="restTimer.skip()">Skip</button>
+        </div>
+    </div>
+    <div class="rest-timer-progress">
+        <div class="rest-timer-progress-bar" id="rest-timer-progress"></div>
+    </div>
+</div>
+
+<script>
+    // Pass server data to JS
+    window.workoutData = {
+        justLogged: {{ just_logged }},
+        restSeconds: {{ rest_seconds }},
+        startedAt: "{{ session.started_at.as_deref().unwrap_or("") }}"
+    };
+</script>
+{% endblock %}

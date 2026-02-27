@@ -1,0 +1,13 @@
+target/
+gym.db
+gym.db-shm
+gym.db-wal
+.env
+.git/
+.sqlx/
+.claude/
+CHANGELOG.md
+README.md
+DOCS.md
+repository.yaml
+docker-compose.yml

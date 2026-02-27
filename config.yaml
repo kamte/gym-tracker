@@ -1,0 +1,20 @@
+name: "Gym Tracker"
+description: "Personal gym workout tracker with exercise logging, session management, and progress tracking"
+version: "1.0.0"
+slug: "gym-tracker"
+url: "https://github.com/kamte/gym-tracker"
+arch:
+  - amd64
+  - aarch64
+  - armv7
+init: false
+ports:
+  3000/tcp: 3000
+ports_description:
+  3000/tcp: "Web UI"
+options:
+  port: 3000
+  log_level: "info"
+schema:
+  port: int
+  log_level: list(trace|debug|info|warn|error)

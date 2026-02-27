@@ -1,0 +1,41 @@
+<!-- Top navbar: visible on desktop only -->
+<nav class="navbar desktop-nav">
+    <div class="nav-brand"><a href="/">Gym Tracker</a></div>
+    <div class="nav-links">
+        <a href="/exercises" {% if active_page == "exercises" %}class="active"{% endif %}>Exercises</a>
+        <a href="/sessions" {% if active_page == "sessions" %}class="active"{% endif %}>Sessions</a>
+        <a href="/records" {% if active_page == "records" %}class="active"{% endif %}>Records</a>
+        <a href="/calendar" {% if active_page == "calendar" %}class="active"{% endif %}>Calendar</a>
+        <a href="/logs" {% if active_page == "logs" %}class="active"{% endif %}>Logs</a>
+        <a href="/plans" {% if active_page == "plans" %}class="active"{% endif %}>Plans</a>
+        <a href="/export" {% if active_page == "export" %}class="active"{% endif %}>Export</a>
+        <span class="nav-user">{{ username }}</span>
+        <form method="post" action="/logout" class="inline">
+            <button type="submit" class="btn btn-sm btn-outline">Logout</button>
+        </form>
+    </div>
+</nav>
+
+<!-- Bottom tabs: visible on mobile only -->
+<nav class="bottom-tabs mobile-nav">
+    <a href="/" class="tab-item {% if active_page == "dashboard" %}active{% endif %}">
+        <span class="tab-icon">&#x1F3E0;</span>
+        <span class="tab-label">Home</span>
+    </a>
+    <a href="/exercises" class="tab-item {% if active_page == "exercises" %}active{% endif %}">
+        <span class="tab-icon">&#x1F4AA;</span>
+        <span class="tab-label">Exercises</span>
+    </a>
+    <a href="/sessions" class="tab-item {% if active_page == "sessions" %}active{% endif %}">
+        <span class="tab-icon">&#x1F4CB;</span>
+        <span class="tab-label">Sessions</span>
+    </a>
+    <a href="/records" class="tab-item {% if active_page == "records" %}active{% endif %}">
+        <span class="tab-icon">&#x1F3C6;</span>
+        <span class="tab-label">Records</span>
+    </a>
+    <a href="/calendar" class="tab-item {% if active_page == "calendar" %}active{% endif %}">
+        <span class="tab-icon">&#x1F4C5;</span>
+        <span class="tab-label">Calendar</span>
+    </a>
+</nav>

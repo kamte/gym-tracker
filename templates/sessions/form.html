@@ -1,0 +1,87 @@
+{% extends "../base.html" %}
+
+{% block title %}{% if session.is_some() %}Edit Session{% else %}New Session{% endif %} - Gym Tracker{% endblock %}
+
+{% block nav %}{% include "nav.html" %}{% endblock %}
+
+{% block content %}
+<h1>{% if session.is_some() %}Edit Session{% else %}New Session{% endif %}</h1>
+
+{% if let Some(err) = error %}
+<div class="alert alert-error">{{ err }}</div>
+{% endif %}
+
+<form method="post" action="{% if let Some(s) = session %}/sessions/{{ s.id }}/edit{% else %}/sessions/new{% endif %}">
+    <div class="form-group">
+        <label for="name">Session Name</label>
+        <input type="text" id="name" name="name" required maxlength="100"
+               value="{% if let Some(s) = session %}{{ s.name }}{% endif %}">
+    </div>
+    <div class="form-group">
+        <label for="scheduled_at">Scheduled Date & Time</label>
+        <input type="datetime-local" id="scheduled_at" name="scheduled_at" required
+               value="{% if let Some(s) = session %}{{ s.scheduled_at }}{% endif %}">
+    </div>
+    <div class="form-group">
+        <label for="status">Status</label>
+        <select id="status" name="status">
+            {% let statuses = ["planned", "completed", "cancelled"] %}
+            {% for st in statuses %}
+            <option value="{{ st }}" {% if let Some(s) = session %}{% if s.status == *st %}selected{% endif %}{% endif %}>{{ st }}</option>
+            {% endfor %}
+        </select>
+    </div>
+    <div class="form-group">
+        <label for="notes">Notes</label>
+        <textarea id="notes" name="notes" rows="3">{% if let Some(s) = session %}{{ s.notes }}{% endif %}</textarea>
+    </div>
+
+    <h2>Exercises</h2>
+    <div class="exercise-row-header">
+        <span>Exercise</span>
+        <span>Sets</span>
+        <span>Reps</span>
+        <span>Weight (kg)</span>
+        <span></span>
+    </div>
+    <div id="exercise-rows">
+        {% if !session_exercises.is_empty() %}
+            {% for se in session_exercises %}
+            <div class="exercise-row">
+                <select name="exercise_id">
+                    <option value="">-- Select Exercise --</option>
+                    {% for ex in available_exercises %}
+                    <option value="{{ ex.id }}" {% if ex.id == se.exercise_id %}selected{% endif %}>{{ ex.name }}</option>
+                    {% endfor %}
+                </select>
+                <input type="number" name="planned_sets" placeholder="Sets" min="1" max="100" value="{{ se.planned_sets }}">
+                <input type="number" name="planned_reps" placeholder="Reps" min="1" max="1000" value="{{ se.planned_reps }}">
+                <input type="number" name="planned_weight_kg" placeholder="Weight (kg)" step="0.5" min="0" value="{{ se.planned_weight_kg }}">
+                <button type="button" class="btn btn-sm btn-danger" onclick="this.parentElement.remove()">X</button>
+            </div>
+            {% endfor %}
+        {% endif %}
+    </div>
+    <button type="button" class="btn btn-outline" onclick="addExerciseRow()">+ Add Exercise</button>
+
+    <div class="form-actions">
+        <button type="submit" class="btn btn-primary">{% if session.is_some() %}Update{% else %}Create{% endif %}</button>
+        <a href="/sessions" class="btn btn-outline">Cancel</a>
+    </div>
+</form>
+
+<template id="exercise-row-template">
+    <div class="exercise-row">
+        <select name="exercise_id">
+            <option value="">-- Select Exercise --</option>
+            {% for ex in available_exercises %}
+            <option value="{{ ex.id }}">{{ ex.name }}</option>
+            {% endfor %}
+        </select>
+        <input type="number" name="planned_sets" placeholder="Sets" min="1" max="100" value="3">
+        <input type="number" name="planned_reps" placeholder="Reps" min="1" max="1000" value="10">
+        <input type="number" name="planned_weight_kg" placeholder="Weight (kg)" step="0.5" min="0" value="0">
+        <button type="button" class="btn btn-sm btn-danger" onclick="this.parentElement.remove()">X</button>
+    </div>
+</template>
+{% endblock %}

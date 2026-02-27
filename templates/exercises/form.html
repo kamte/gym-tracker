@@ -1,0 +1,68 @@
+{% extends "../base.html" %}
+
+{% block title %}{% if exercise.is_some() %}Edit Exercise{% else %}New Exercise{% endif %} - Gym Tracker{% endblock %}
+
+{% block nav %}{% include "nav.html" %}{% endblock %}
+
+{% block content %}
+<h1>{% if exercise.is_some() %}Edit Exercise{% else %}New Exercise{% endif %}</h1>
+
+{% if let Some(err) = error %}
+<div class="alert alert-error">{{ err }}</div>
+{% endif %}
+
+<form method="post" action="{% if let Some(ex) = exercise %}/exercises/{{ ex.id }}/edit{% else %}/exercises/new{% endif %}">
+    <div class="form-group">
+        <label for="name">Name</label>
+        <input type="text" id="name" name="name" required maxlength="100"
+               value="{% if let Some(ex) = exercise %}{{ ex.name }}{% endif %}">
+    </div>
+    <div class="form-group">
+        <label for="muscle_group">Muscle Group</label>
+        <select id="muscle_group" name="muscle_group">
+            {% let groups = ["", "Chest", "Back", "Shoulders", "Biceps", "Triceps", "Legs", "Glutes", "Core", "Full Body", "Cardio", "Other"] %}
+            {% for g in groups %}
+            <option value="{{ g }}" {% if let Some(ex) = exercise %}{% if ex.muscle_group == *g %}selected{% endif %}{% endif %}>
+                {% if g.is_empty() %}-- Select --{% else %}{{ g }}{% endif %}
+            </option>
+            {% endfor %}
+        </select>
+    </div>
+    <div class="form-group">
+        <label for="equipment">Equipment</label>
+        <select id="equipment" name="equipment">
+            {% let equip_options = ["", "Barbell", "Dumbbell", "Cable", "Machine", "Bodyweight", "Resistance Band", "Other"] %}
+            {% for e in equip_options %}
+            <option value="{{ e }}" {% if let Some(ex) = exercise %}{% if ex.equipment == *e %}selected{% endif %}{% endif %}>
+                {% if e.is_empty() %}-- Select --{% else %}{{ e }}{% endif %}
+            </option>
+            {% endfor %}
+        </select>
+    </div>
+    <div class="form-group">
+        <label for="difficulty">Difficulty</label>
+        <select id="difficulty" name="difficulty">
+            {% let diff_options = ["beginner", "intermediate", "advanced"] %}
+            {% for d in diff_options %}
+            <option value="{{ d }}" {% if let Some(ex) = exercise %}{% if ex.difficulty == *d %}selected{% endif %}{% endif %}>{{ d }}</option>
+            {% endfor %}
+        </select>
+    </div>
+    <div class="form-group">
+        <label for="description">Description</label>
+        <textarea id="description" name="description" rows="3">{% if let Some(ex) = exercise %}{{ ex.description }}{% endif %}</textarea>
+    </div>
+    <div class="form-group">
+        <label for="instructions">Instructions (one step per line)</label>
+        <textarea id="instructions" name="instructions" rows="6">{% if let Some(ex) = exercise %}{{ ex.instructions }}{% endif %}</textarea>
+    </div>
+    <div class="form-group">
+        <label for="tips">Tips (one per line)</label>
+        <textarea id="tips" name="tips" rows="3">{% if let Some(ex) = exercise %}{{ ex.tips }}{% endif %}</textarea>
+    </div>
+    <div class="form-actions">
+        <button type="submit" class="btn btn-primary">{% if exercise.is_some() %}Update{% else %}Create{% endif %}</button>
+        <a href="/exercises" class="btn btn-outline">Cancel</a>
+    </div>
+</form>
+{% endblock %}

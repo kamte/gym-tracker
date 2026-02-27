@@ -1,0 +1,32 @@
+{% extends "base.html" %}
+
+{% block title %}Export Data - Gym Tracker{% endblock %}
+
+{% block nav %}{% include "nav.html" %}{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <h1>Export Data</h1>
+</div>
+
+<div class="detail-card">
+    <p style="margin-bottom: 1rem;">Download your workout data as CSV files for spreadsheet analysis or backup.</p>
+
+    <div class="export-buttons">
+        <a href="/export/logs.csv" class="btn btn-primary" download>
+            &#x1F4CA; Export Workout Logs
+        </a>
+        <a href="/export/sessions.csv" class="btn btn-outline" download>
+            &#x1F4CB; Export Sessions
+        </a>
+    </div>
+
+    <div class="export-info">
+        <h3>Log Export Columns</h3>
+        <p class="text-muted">Date, Exercise, Muscle Group, Session, Set, Weight (kg), Reps, RPE, Set Type, Notes</p>
+
+        <h3>Session Export Columns</h3>
+        <p class="text-muted">Name, Scheduled At, Status, Started At, Completed At, Notes</p>
+    </div>
+</div>
+{% endblock %}

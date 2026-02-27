@@ -1,0 +1,64 @@
+{% extends "../base.html" %}
+
+{% block title %}Log Detail - Gym Tracker{% endblock %}
+
+{% block nav %}{% include "nav.html" %}{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <h1>Log Entry</h1>
+    <div class="actions">
+        <form method="post" action="/logs/{{ log.id }}" class="inline" onsubmit="return confirmDelete('log entry')">
+            <button type="submit" class="btn btn-danger">Delete</button>
+        </form>
+    </div>
+</div>
+
+<div class="detail-card">
+    <div class="detail-row">
+        <strong>Exercise:</strong>
+        <span>{{ log.exercise_name }}</span>
+        <span class="badge">{{ log.muscle_group }}</span>
+    </div>
+    <div class="detail-row">
+        <strong>Set Type:</strong>
+        <span class="badge badge-set-{{ log.set_type }}">{{ log.set_type }}</span>
+    </div>
+    <div class="detail-row">
+        <strong>Set:</strong>
+        <span>{{ log.set_number }}</span>
+    </div>
+    <div class="detail-row">
+        <strong>Reps Completed:</strong>
+        <span>{{ log.reps_completed }}</span>
+    </div>
+    <div class="detail-row">
+        <strong>Weight:</strong>
+        <span>{{ log.weight_kg }} kg</span>
+    </div>
+    {% if let Some(rpe) = log.rpe %}
+    <div class="detail-row">
+        <strong>RPE:</strong>
+        <span>{{ rpe }}</span>
+    </div>
+    {% endif %}
+    {% if let Some(sname) = log.session_name %}
+    <div class="detail-row">
+        <strong>Session:</strong>
+        <span>{{ sname }}</span>
+    </div>
+    {% endif %}
+    {% if !log.notes.is_empty() %}
+    <div class="detail-row">
+        <strong>Notes:</strong>
+        <span>{{ log.notes }}</span>
+    </div>
+    {% endif %}
+    <div class="detail-row">
+        <strong>Performed At:</strong>
+        <span>{{ log.performed_at }}</span>
+    </div>
+</div>
+
+<a href="/logs" class="btn btn-outline">&larr; Back to Logs</a>
+{% endblock %}

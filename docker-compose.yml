@@ -1,0 +1,16 @@
+services:
+  gym:
+    build: .
+    ports:
+      - "3000:3000"
+    environment:
+      - DATABASE_URL=sqlite:./data/gym.db
+      - JWT_SECRET=${JWT_SECRET:?Generate a secret with: openssl rand -base64 32}
+      - HOST=0.0.0.0
+      - PORT=3000
+      - RUST_LOG=gym=info,tower_http=info
+    volumes:
+      - gym-data:/app/data
+
+volumes:
+  gym-data:

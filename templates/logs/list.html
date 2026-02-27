@@ -1,0 +1,45 @@
+{% extends "../base.html" %}
+
+{% block title %}Workout Logs - Gym Tracker{% endblock %}
+
+{% block nav %}{% include "nav.html" %}{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <h1>Workout Logs</h1>
+    <a href="/logs/new" class="btn btn-primary">Log Workout</a>
+</div>
+
+{% if let Some(msg) = message %}
+<div class="alert alert-success">{{ msg }}</div>
+{% endif %}
+
+{% if logs.is_empty() %}
+<p class="empty-state">No logs yet. Start logging your workouts!</p>
+{% else %}
+<div class="card-list">
+    {% for log in logs %}
+    <div class="card-item">
+        <div class="card-item-header">
+            <a href="/logs/{{ log.id }}" class="card-item-title">{{ log.exercise_name }}</a>
+            <div class="card-item-badges">
+                <span class="badge">{{ log.muscle_group }}</span>
+                {% if log.set_type != "working" %}
+                <span class="badge badge-set-{{ log.set_type }}">{{ log.set_type }}</span>
+                {% endif %}
+            </div>
+        </div>
+        <div class="card-item-meta">
+            Set {{ log.set_number }}: {{ log.weight_kg }}kg x {{ log.reps_completed }} reps{% if let Some(rpe) = log.rpe %} &middot; RPE {{ rpe }}{% endif %}{% if let Some(sname) = log.session_name %} &middot; {{ sname }}{% endif %}
+        </div>
+        <div class="card-item-footer">
+            <span class="text-muted">{{ log.performed_at }}</span>
+            <form method="post" action="/logs/{{ log.id }}" class="inline" onsubmit="return confirmDelete('log entry')">
+                <button type="submit" class="btn btn-sm btn-danger">Delete</button>
+            </form>
+        </div>
+    </div>
+    {% endfor %}
+</div>
+{% endif %}
+{% endblock %}

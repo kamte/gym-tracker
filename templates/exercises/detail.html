@@ -1,0 +1,131 @@
+{% extends "../base.html" %}
+
+{% block title %}{{ exercise.name }} - Gym Tracker{% endblock %}
+
+{% block nav %}{% include "nav.html" %}{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <h1>{{ exercise.name }}</h1>
+    <div class="actions">
+        <a href="/exercises/{{ exercise.id }}/edit" class="btn">Edit</a>
+        <form method="post" action="/exercises/{{ exercise.id }}" class="inline" onsubmit="return confirmDelete('exercise')">
+            <button type="submit" class="btn btn-danger">Delete</button>
+        </form>
+    </div>
+</div>
+
+{% if !prs.is_empty() %}
+<div class="pr-section">
+    <h2>&#x1F3C6; Personal Records</h2>
+    <div class="pr-grid">
+        {% for pr in prs %}
+        <div class="pr-card">
+            <div class="pr-type">
+                {% if pr.record_type == "max_weight" %}Max Weight
+                {% else if pr.record_type == "max_reps" %}Max Reps
+                {% else if pr.record_type == "max_volume" %}Max Volume
+                {% else if pr.record_type == "estimated_1rm" %}Est. 1RM
+                {% else %}{{ pr.record_type }}{% endif %}
+            </div>
+            <div class="pr-value">
+                {% if pr.record_type == "max_reps" %}{{ pr.value as i64 }}
+                {% else if pr.record_type == "max_volume" %}{{ pr.value as i64 }} kg
+                {% else %}{{ pr.value }} kg{% endif %}
+            </div>
+            <div class="pr-date">{{ pr.achieved_at }}</div>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+{% endif %}
+
+{% if progress_json != "[]" %}
+<div class="chart-section">
+    <h2>Progress</h2>
+    <div class="chart-toggles">
+        <button class="chart-toggle active" data-metric="max_weight" onclick="switchChart('max_weight', this)">Weight</button>
+        <button class="chart-toggle" data-metric="total_volume" onclick="switchChart('total_volume', this)">Volume</button>
+        <button class="chart-toggle" data-metric="max_estimated_1rm" onclick="switchChart('max_estimated_1rm', this)">Est. 1RM</button>
+    </div>
+    <div class="chart-container">
+        <canvas id="progress-chart" width="800" height="300" data-progress="{{ progress_json }}"></canvas>
+    </div>
+</div>
+<script>
+    window.progressData = JSON.parse(document.getElementById('progress-chart').getAttribute('data-progress'));
+</script>
+{% endif %}
+
+<div class="detail-card">
+    <div class="detail-row">
+        <strong>Muscle Group:</strong>
+        <span class="badge">{{ exercise.muscle_group }}</span>
+    </div>
+    {% if !exercise.equipment.is_empty() %}
+    <div class="detail-row">
+        <strong>Equipment:</strong>
+        <span>{{ exercise.equipment }}</span>
+    </div>
+    {% endif %}
+    <div class="detail-row">
+        <strong>Difficulty:</strong>
+        <span class="badge badge-difficulty">{{ exercise.difficulty }}</span>
+    </div>
+    {% if !exercise.description.is_empty() %}
+    <div class="detail-row">
+        <strong>Description:</strong>
+        <p>{{ exercise.description }}</p>
+    </div>
+    {% endif %}
+    <div class="detail-row">
+        <strong>Created:</strong>
+        <span>{{ exercise.created_at }}</span>
+    </div>
+</div>
+
+{% if !instructions_lines.is_empty() %}
+<div class="detail-section">
+    <h2>Instructions</h2>
+    <ol class="instructions-list">
+        {% for step in instructions_lines %}
+        <li>{{ step }}</li>
+        {% endfor %}
+    </ol>
+</div>
+{% endif %}
+
+{% if !tips_lines.is_empty() %}
+<div class="detail-section">
+    <h2>Tips</h2>
+    <ul class="tips-list">
+        {% for tip in tips_lines %}
+        <li>{{ tip }}</li>
+        {% endfor %}
+    </ul>
+</div>
+{% endif %}
+
+<h2>History</h2>
+{% if logs.is_empty() %}
+<p class="empty-state">No logs for this exercise yet.</p>
+{% else %}
+<div class="card-list">
+    {% for log in logs %}
+    <div class="card-item compact">
+        <div class="card-item-footer">
+            <span>
+                {{ log.weight_kg }}kg x {{ log.reps_completed }} reps (Set {{ log.set_number }})
+                {% if log.set_type != "working" %}
+                <span class="badge badge-set-{{ log.set_type }}">{{ log.set_type }}</span>
+                {% endif %}
+            </span>
+            <span class="text-muted">{{ log.performed_at }}</span>
+        </div>
+    </div>
+    {% endfor %}
+</div>
+{% endif %}
+
+<a href="/exercises" class="btn btn-outline">&larr; Back to Exercises</a>
+{% endblock %}

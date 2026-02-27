@@ -1,0 +1,42 @@
+{% extends "../base.html" %}
+
+{% block title %}Workout Plans - Gym Tracker{% endblock %}
+
+{% block nav %}{% include "nav.html" %}{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <h1>Suggested Workout Plans</h1>
+</div>
+<p>Research-backed 3-day/week programs. Pick one that matches your experience level and goals.</p>
+
+{% for plan in plans %}
+<div class="detail-card plan-card">
+    <div class="plan-card-header">
+        <h2>{{ plan.name }}</h2>
+        <span class="badge">{{ plan.difficulty }}</span>
+    </div>
+    <p class="plan-description">{{ plan.description }}</p>
+
+    {% for day in plan.days %}
+    <h3>{{ day.name }}</h3>
+    <div class="card-list plan-day-exercises">
+        {% for ex in day.exercises %}
+        <div class="card-item compact">
+            <div class="card-item-footer">
+                <span>{{ ex.name }}</span>
+                <span class="text-muted">{{ ex.sets }}x{{ ex.reps }}{% if ex.weight_kg > 0.0 %} @ {{ ex.weight_kg }}kg{% else %}{% endif %}</span>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+    {% endfor %}
+
+    <p class="plan-tip"><strong>Tip:</strong> {{ plan.tip }}</p>
+
+    <form method="post" action="/plans/{{ plan.id }}/use">
+        <button type="submit" class="btn btn-primary btn-block">Use this plan</button>
+    </form>
+</div>
+{% endfor %}
+{% endblock %}

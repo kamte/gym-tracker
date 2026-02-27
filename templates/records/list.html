@@ -1,0 +1,35 @@
+{% extends "../base.html" %}
+
+{% block title %}Personal Records - Gym Tracker{% endblock %}
+
+{% block nav %}{% include "nav.html" %}{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <h1>&#x1F3C6; Personal Records</h1>
+</div>
+
+{% if grouped_records.is_empty() %}
+<p class="empty-state">No personal records yet. Start logging workouts to track your PRs!</p>
+{% else %}
+<div class="card-list">
+    {% for group in grouped_records %}
+    <div class="card-item">
+        <div class="card-item-header">
+            <span class="card-item-title">{{ group.0 }}</span>
+            <span class="badge">{{ group.1 }}</span>
+        </div>
+        <div class="pr-records-list">
+            {% for entry in group.2 %}
+            <div class="pr-record-row">
+                <span class="pr-record-type">{{ entry.record_type }}</span>
+                <span class="pr-record-value">{{ entry.value }}</span>
+                <span class="text-muted">{{ entry.achieved_at }}</span>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+    {% endfor %}
+</div>
+{% endif %}
+{% endblock %}

@@ -1,0 +1,51 @@
+{% extends "base.html" %}
+
+{% block title %}Calendar - Gym Tracker{% endblock %}
+
+{% block nav %}{% include "nav.html" %}{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <h1>&#x1F4C5; Workout Calendar</h1>
+</div>
+
+<div class="calendar-card">
+    <div class="calendar-nav">
+        <a href="/calendar?month={{ prev_month }}" class="btn btn-sm">&larr;</a>
+        <h2>{{ month_name }} {{ year }}</h2>
+        <a href="/calendar?month={{ next_month }}" class="btn btn-sm">&rarr;</a>
+    </div>
+
+    <div class="calendar-summary">
+        {{ workout_count }} workout{% if workout_count != 1 %}s{% endif %} this month
+    </div>
+
+    <div class="calendar-grid">
+        <div class="calendar-header">Mon</div>
+        <div class="calendar-header">Tue</div>
+        <div class="calendar-header">Wed</div>
+        <div class="calendar-header">Thu</div>
+        <div class="calendar-header">Fri</div>
+        <div class="calendar-header">Sat</div>
+        <div class="calendar-header">Sun</div>
+
+        {% for day_opt in calendar_days %}
+        {% if let Some(day) = day_opt %}
+        <div class="calendar-day{% if day.has_workout %} calendar-day--has-workout{% endif %}{% if day.is_today %} calendar-day--today{% endif %}">
+            <span class="calendar-day-number">{{ day.day }}</span>
+            {% if day.has_workout %}
+            <span class="calendar-dot"></span>
+            <div class="calendar-tooltip">
+                {% for name in day.session_names %}
+                <div>{{ name }}</div>
+                {% endfor %}
+            </div>
+            {% endif %}
+        </div>
+        {% else %}
+        <div class="calendar-day calendar-day--empty"></div>
+        {% endif %}
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}

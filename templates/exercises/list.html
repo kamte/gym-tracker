@@ -1,0 +1,53 @@
+{% extends "../base.html" %}
+
+{% block title %}Exercises - Gym Tracker{% endblock %}
+
+{% block nav %}{% include "nav.html" %}{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <h1>Exercises</h1>
+    <div class="actions">
+        <form method="post" action="/exercises/seed" class="inline">
+            <button type="submit" class="btn btn-outline">Load Defaults</button>
+        </form>
+        <a href="/exercises/new" class="btn btn-primary">New Exercise</a>
+    </div>
+</div>
+
+{% if let Some(msg) = message %}
+<div class="alert alert-success">{{ msg }}</div>
+{% endif %}
+
+{% if exercises.is_empty() %}
+<p class="empty-state">No exercises yet. Create your first exercise or load the defaults!</p>
+{% else %}
+<div class="card-list">
+    {% for ex in exercises %}
+    <div class="card-item">
+        <div class="card-item-header">
+            <a href="/exercises/{{ ex.id }}" class="card-item-title">{{ ex.name }}</a>
+            <div class="card-item-badges">
+                <span class="badge">{{ ex.muscle_group }}</span>
+                {% if !ex.difficulty.is_empty() && ex.difficulty != "beginner" %}
+                <span class="badge badge-difficulty">{{ ex.difficulty }}</span>
+                {% endif %}
+            </div>
+        </div>
+        {% if !ex.equipment.is_empty() %}
+        <div class="card-item-meta">{{ ex.equipment }}</div>
+        {% endif %}
+        {% if !ex.description.is_empty() %}
+        <p class="card-item-desc">{{ ex.description }}</p>
+        {% endif %}
+        <div class="card-item-actions">
+            <a href="/exercises/{{ ex.id }}/edit" class="btn btn-sm">Edit</a>
+            <form method="post" action="/exercises/{{ ex.id }}" class="inline" onsubmit="return confirmDelete('exercise')">
+                <button type="submit" class="btn btn-sm btn-danger">Delete</button>
+            </form>
+        </div>
+    </div>
+    {% endfor %}
+</div>
+{% endif %}
+{% endblock %}

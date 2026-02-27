@@ -1,0 +1,4 @@
+build_from:
+  amd64: "debian:bookworm-slim"
+  aarch64: "debian:bookworm-slim"
+  armv7: "debian:bookworm-slim"

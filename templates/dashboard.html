@@ -1,0 +1,112 @@
+{% extends "base.html" %}
+
+{% block title %}Dashboard - Gym Tracker{% endblock %}
+
+{% block nav %}{% include "nav.html" %}{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <h1>Dashboard</h1>
+</div>
+
+{% if let Some(session) = today_session %}
+<div class="today-workout-card">
+    <h2>Today's Workout</h2>
+    <h3>{{ session.name }}</h3>
+    {% for ex in today_exercises %}
+    <div class="today-exercise-row">
+        <span class="exercise-name">{{ ex.exercise_name }}</span>
+        <span class="exercise-plan">{{ ex.planned_sets }}x{{ ex.planned_reps }}{% if ex.planned_weight_kg > 0.0 %} @ {{ ex.planned_weight_kg }}kg{% endif %}</span>
+    </div>
+    {% endfor %}
+    <a href="/sessions/{{ session.id }}/workout" class="btn btn-primary btn-block">Start Workout</a>
+</div>
+{% endif %}
+
+<div class="stats-grid">
+    <div class="stat-card">
+        <div class="stat-number">{{ exercise_count }}</div>
+        <div class="stat-label">Exercises</div>
+    </div>
+    <div class="stat-card">
+        <div class="stat-number">{{ session_count }}</div>
+        <div class="stat-label">Sessions</div>
+    </div>
+    <div class="stat-card">
+        <div class="stat-number">{{ log_count }}</div>
+        <div class="stat-label">Log Entries</div>
+    </div>
+</div>
+
+{% if !recent_prs.is_empty() %}
+<section>
+    <h2>&#x1F3C6; Recent PRs</h2>
+    <div class="card-list">
+        {% for pr in recent_prs %}
+        <div class="card-item compact pr-item">
+            <div class="card-item-header">
+                <span class="card-item-title">{{ pr.exercise_name }}</span>
+                <span class="badge">{{ pr.muscle_group }}</span>
+            </div>
+            <div class="card-item-footer">
+                <span>
+                    {% if pr.record_type == "max_weight" %}Max Weight: {{ pr.value }} kg
+                    {% else if pr.record_type == "max_reps" %}Max Reps: {{ pr.value as i64 }}
+                    {% else if pr.record_type == "max_volume" %}Max Volume: {{ pr.value as i64 }} kg
+                    {% else if pr.record_type == "estimated_1rm" %}Est. 1RM: {{ pr.value }} kg
+                    {% else %}{{ pr.record_type }}: {{ pr.value }}{% endif %}
+                </span>
+                <span class="text-muted">{{ pr.achieved_at }}</span>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+    <a href="/records" class="btn btn-outline btn-sm" style="margin-top: 0.5rem;">View All Records</a>
+</section>
+{% endif %}
+
+<div class="dashboard-grid">
+    <section>
+        <h2>Upcoming Sessions</h2>
+        {% if upcoming_sessions.is_empty() %}
+        <p class="empty-state">No upcoming sessions. <a href="/sessions/new">Plan one</a></p>
+        {% else %}
+        <ul class="list">
+            {% for s in upcoming_sessions %}
+            <li class="list-item">
+                <a href="/sessions/{{ s.id }}">
+                    <strong>{{ s.name }}</strong>
+                    <span class="text-muted">{{ s.scheduled_at }}</span>
+                </a>
+            </li>
+            {% endfor %}
+        </ul>
+        {% endif %}
+    </section>
+
+    <section>
+        <h2>Recent Logs</h2>
+        {% if recent_logs.is_empty() %}
+        <p class="empty-state">No logs yet. <a href="/logs/new">Log a workout</a></p>
+        {% else %}
+        <ul class="list">
+            {% for log in recent_logs %}
+            <li class="list-item">
+                <a href="/logs/{{ log.id }}">
+                    <strong>{{ log.exercise_name }}</strong>
+                    <span>{{ log.weight_kg }}kg x {{ log.reps_completed }} reps (Set {{ log.set_number }})</span>
+                    <span class="text-muted">{{ log.performed_at }}</span>
+                </a>
+            </li>
+            {% endfor %}
+        </ul>
+        {% endif %}
+    </section>
+</div>
+
+<div class="quick-actions">
+    <a href="/exercises/new" class="btn btn-primary">New Exercise</a>
+    <a href="/sessions/new" class="btn btn-primary">Plan Session</a>
+    <a href="/logs/new" class="btn btn-primary">Log Workout</a>
+</div>
+{% endblock %}

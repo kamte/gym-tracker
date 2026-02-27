@@ -1,0 +1,10 @@
+/target
+gym.db
+gym.db-shm
+gym.db-wal
+*.db-journal
+.env
+.sqlx/
+.claude/
+.DS_Store
+Thumbs.db

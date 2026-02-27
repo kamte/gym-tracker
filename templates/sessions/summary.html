@@ -1,0 +1,35 @@
+{% extends "../base.html" %}
+
+{% block title %}Workout Complete! - Gym Tracker{% endblock %}
+
+{% block nav %}{% include "nav.html" %}{% endblock %}
+
+{% block content %}
+<div class="summary-card">
+    <div class="summary-icon">&#x1F3CB;</div>
+    <h1>Workout Complete!</h1>
+    <h2>{{ session.name }}</h2>
+
+    <div class="summary-stats">
+        {% if let Some(mins) = duration_minutes %}
+        <div class="summary-stat">
+            <div class="summary-stat-value">{{ mins }}</div>
+            <div class="summary-stat-label">Minutes</div>
+        </div>
+        {% endif %}
+        <div class="summary-stat">
+            <div class="summary-stat-value">{{ total_sets }}</div>
+            <div class="summary-stat-label">Sets</div>
+        </div>
+        <div class="summary-stat">
+            <div class="summary-stat-value">{{ total_volume as i64 }}</div>
+            <div class="summary-stat-label">Volume (kg)</div>
+        </div>
+    </div>
+
+    <div class="summary-actions">
+        <a href="/sessions/{{ session.id }}" class="btn btn-outline">View Session</a>
+        <a href="/" class="btn btn-primary">Back to Dashboard</a>
+    </div>
+</div>
+{% endblock %}
