@@ -1,8 +1,10 @@
 # HA passes BUILD_FROM; standalone builds use the default
-ARG BUILD_FROM=debian:bookworm-slim
+ARG BUILD_FROM=alpine:3.19
 
 # Build stage
-FROM rust:1-bookworm AS builder
+FROM rust:1-alpine AS builder
+
+RUN apk add --no-cache musl-dev sqlite-dev pkgconf
 
 WORKDIR /app
 
@@ -18,12 +20,7 @@ RUN cargo build --release
 # Runtime stage
 FROM ${BUILD_FROM}
 
-RUN apt-get update && apt-get install -y --no-install-recommends \
-    ca-certificates \
-    libsqlite3-0 \
-    jq \
-    openssl \
-    && rm -rf /var/lib/apt/lists/*
+RUN apk add --no-cache ca-certificates sqlite-libs jq openssl bash
 
 WORKDIR /app
 
